@@ -138,7 +138,7 @@ module.exports = function(RED) {
 
 			// register for all item events
 
-			node.es= new EventSource(getConnectionString(config) + "/rest/events?topics=smarthome/items", {});
+			node.es= new EventSource(getConnectionString(config) + "/rest/events?topics=openhab/items", {});
 
 			// handle the 'onopen' event
 
@@ -158,7 +158,7 @@ module.exports = function(RED) {
 				    msg = JSON.parse(msg.data);
 				    msg.payload = JSON.parse(msg.payload);
 
-				    const itemStart = ("smarthome/items/").length;
+				    const itemStart = ("openhab/items/").length;
 				    var item = msg.topic.substring(itemStart, msg.topic.indexOf('/',itemStart));
 
 				    node.emit(item + "/RawEvent", msg);
@@ -220,6 +220,11 @@ module.exports = function(RED) {
 
 		this.control = function(itemname, topic, payload, okCb, errCb) {
 			var url;
+			var method;
+            const headers = {
+              'Content-Type': 'text/plain',
+              'Accept': 'application/json'
+            }
 
             if ( topic === "ItemUpdate" )
             {
@@ -237,7 +242,8 @@ module.exports = function(RED) {
             	method = request.get;
             }
 
-			method({url: url, body: String(payload)}, function(error, response, body) {
+			method({url: url, headers: headers, body: String(payload)}, function(error, response, body) {
+
         		if ( error )
         		{
 					node.emit('CommunicationError', error);
@@ -267,7 +273,7 @@ module.exports = function(RED) {
 
   // start a web service for enabling the node configuration ui to query for available openHAB items
 
-	RED.httpNode.get("/openhab2/items",function(req, res, next) {
+	RED.httpAdmin.get("/openhab2/items",function(req, res, next) {
 		var config = req.query;
 		var url = getConnectionString(config) + '/rest/items';
 		request.get(url, function(error, response, body) {
@@ -563,7 +569,7 @@ module.exports = function(RED) {
 			// register for all item events
 
 
-			node.es = new EventSource(getConnectionString(openhabController.getConfig()) + "/rest/events?topics=smarthome/*/*", {});
+			node.es = new EventSource(getConnectionString(openhabController.getConfig()) + "/rest/events?topics=openhab/*/*", {});
 
 			// handle the 'onopen' event
 

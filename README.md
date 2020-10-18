@@ -1,4 +1,7 @@
 # node-red-contrib-openhab2
+## Important
+Modified to support openHAB 3
+
 ## Description
 
 Nodes facilitating the automation of *openHAB* ( <http://www.openhab.org> ) items with Node-RED ( <http://nodered.org> ).
